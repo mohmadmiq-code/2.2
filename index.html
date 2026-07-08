@@ -2609,7 +2609,7 @@ function cuBookCommonNotes(){
   return [
     "الفئات في هذا الدرس فعلية متصلة، لذلك نهاية الفئة السابقة هي بداية الفئة التالية.",
     "عند بناء الفئات نستخدم: الحد الأعلى الفعلي = الحد الأدنى الفعلي + سعة الفئة.",
-    "عند المقارنة بين أكبر أو أقل تكرار، تكون القيم مولّدة بحيث يكون الجواب واحدًا فقط دون تعادل."
+    "عند المقارنة بين أكبر أو أقل تكرار، نرجع إلى عمود التكرارات ونختار الفئة المطلوبة."
   ];
 }
 
@@ -2633,6 +2633,7 @@ const TEMPLATES = [
       const C = Math.ceil((R+1)/k);
       const grid = chunk(values, 11).map(row=>row.join(", ")).join("<br/>");
       return {branches:[{
+        aiKey:"classBuild",
         level:"متوسط",
         explain:[
           "نبدأ بتحديد أصغر قيمة وأكبر قيمة في البيانات، ثم نحسب المدى.",
@@ -2646,7 +2647,7 @@ const TEMPLATES = [
           "\\(C=\\left\\lceil\\dfrac{R+1}{k}\\right\\rceil\\)، حيث \\(C\\) سعة الفئة.",
           "للفئات الفعلية المتصلة: \\(b_i=b_{i-1}+C\\)."
         ],
-        prompt:`أمامك بيانات عددها \\(n=${n}\\):<br/><div class="dataGrid">${grid}</div>أوجد ما يلي:<br/>(أ) المدى \\(R\\).<br/>(ب) عدد الفئات \\(k\\) باستخدام \\(k=\\lfloor1.443\\ln(n)\\rfloor\\).<br/>(ج) سعة الفئة \\(C\\) باستخدام \\(C=\\left\\lceil\\dfrac{R+1}{k}\\right\\rceil\\).`,
+        prompt:`أمامك بيانات عددها \(n=${n}\):<br/><div class="dataGrid">${grid}</div>أوجد ما يلي:<br/>(أ) المدى \(R\).<br/>(ب) عدد الفئات \(k\) باستخدام:<br/><span class="mathBlock">\(k=\lfloor1.443\ln(n)\rfloor\)</span><br/>(ج) سعة الفئة \(C\) باستخدام:<br/><span class="mathBlock">\(C=\left\lceil\dfrac{R+1}{k}\right\rceil\)</span>`,
         parts:[
           {key:"R", type:"number", label:"(أ) R", step:"1"},
           {key:"k", type:"number", label:"(ب) k", step:"1"},
@@ -2679,6 +2680,7 @@ const TEMPLATES = [
       const Lx=classes[pick].L, Ux=classes[pick].U;
       const xi2=(classes[1].L+classes[1].U)/2;
       return {branches:[{
+        aiKey:"classBounds",
         level:"سهل",
         explain:[
           "الفئات هنا فعلية متصلة، لذلك لا توجد فجوة بين فئة والتي بعدها.",
@@ -2729,6 +2731,7 @@ const TEMPLATES = [
       const pct=+((fi/n)*100).toFixed(1);
       const Fi=cuSum(counts.slice(0,j+1));
       return {branches:[{
+        aiKey:"relPctCum",
         level:"متوسط",
         explain:[
           "التكرار النسبي يبيّن نصيب الفئة من مجموع البيانات.",
@@ -2778,8 +2781,9 @@ const TEMPLATES = [
       const jRead=randInt(r,0,k-1), readLabel=classLabels[jRead], readF=counts[jRead];
       const jPct=randInt(r,0,k-1), pctLabel=classLabels[jPct], pctVal=+((counts[jPct]/n)*100).toFixed(1);
       const branch1={
+        aiKey:"mostClass",
         level:"سهل",
-        explain:["المدرج التكراري يستخدم الفئات الفعلية المتصلة، وتكون الأعمدة متلاصقة.","ارتفاع العمود يمثل تكرار الفئة.","الفئة ذات أعلى عمود هي الفئة الأعلى تكرارًا، والقيم مولّدة هنا بلا تعادل في أكبر تكرار."],
+        explain:["المدرج التكراري يستخدم الفئات الفعلية المتصلة، وتكون الأعمدة متلاصقة.","ارتفاع العمود يمثل تكرار الفئة.","الفئة ذات أعلى عمود هي الفئة الأعلى تكرارًا."],
         formula:["المدرج التكراري = فئات فعلية متصلة + أعمدة متلاصقة.","ارتفاع العمود = \\(f_i\\)، حيث \\(f_i\\) تكرار الفئة."],
         prompt:`بناءً على المدرج التكراري أعلاه (\\(n=${n}\\)):<br/>(أ) حدّد الفئة الأعلى تكرارًا.<br/>(ب) اكتب تكرار هذه الفئة.`,
         parts:[{key:"peak", type:"mcq", label:"(أ) الفئة الأعلى تكرارًا", options:classLabels},{key:"peakF", type:"number", label:"(ب) تكرارها", step:"1"}],
@@ -2787,6 +2791,7 @@ const TEMPLATES = [
         solutionSteps:[`نقارن ارتفاعات الأعمدة، وأعلى عمود هو للفئة ${peakLabel}.`,`تكرار هذه الفئة هو \\(f_i=${peakF}\\).`,`إذن الإجابة الصحيحة هي: الفئة ${peakLabel} وتكرارها ${peakF}.`]
       };
       const branch2={
+        aiKey:"readFreq",
         level:"سهل",
         explain:["عند قراءة تكرار فئة من المدرج، نحدد الفئة على المحور الأفقي ثم نقرأ ارتفاع عمودها.","لا نستخدم مركز الفئة هنا؛ المطلوب هو ارتفاع العمود فقط."],
         formula:["\\(f_i\\) هو ارتفاع العمود المقابل للفئة رقم \\(i\\)."],
@@ -2796,6 +2801,7 @@ const TEMPLATES = [
         solutionSteps:[`الفئة المطلوبة هي ${readLabel}.`,`ارتفاع العمود المقابل لها يساوي ${readF}.`,`إذن الإجابة الصحيحة هي: \\(f_i=${readF}\\).`]
       };
       const branch3={
+        aiKey:"pct",
         level:"متوسط",
         explain:["التكرار المئوي يوضح نسبة الفئة من مجموع البيانات.","نأخذ تكرار الفئة من ارتفاع العمود، ثم نقسمه على المجموع، ثم نضرب في 100%."],
         formula:["\\(\\phi_i=\\dfrac{f_i}{n}\\)، والتكرار المئوي \\(=\\phi_i\\times100\\%\\)."],
@@ -2805,6 +2811,7 @@ const TEMPLATES = [
         solutionSteps:[`تكرار الفئة ${pctLabel} هو \\(f_i=${counts[jPct]}\\)، والمجموع \\(n=${n}\\).`,`\\(\\phi_i=\\dfrac{${counts[jPct]}}{${n}}=${(counts[jPct]/n).toFixed(3)}\\).`,`التكرار المئوي \\(=${pctVal}\\%\\).`,`إذن الإجابة الصحيحة هي: ${pctVal}%.`]
       };
       const branch4={
+        aiKey:"hist",
         level:"سهل",
         explain:["المحور الأفقي في المدرج يمثل الفئات الفعلية المتصلة، والمحور الرأسي يمثل التكرارات.","الأعمدة تكون متلاصقة لأن الفئات متصلة."],
         prompt:"ما العبارة الصحيحة عن المدرج التكراري؟",
@@ -2834,8 +2841,9 @@ const TEMPLATES = [
       const peakMid=mids[peak], peakF=counts[peak];
       const concept="يُرسم بربط نقاط تمثل مراكز الفئات وتكراراتها.";
       return {branches:[{
+        aiKey:"poly",
         level:"متوسط",
-        explain:["المضلع التكراري يعتمد على مراكز الفئات وليس على الحدود مباشرة.","كل فئة تمثل بنقطة من الشكل: مركز الفئة، تكرار الفئة.","نصل النقاط بخطوط مستقيمة، والفئة الأعلى تكرارًا تقابل أعلى نقطة.","لا يوجد تعادل في أعلى تكرار في هذا السؤال."],
+        explain:["المضلع التكراري يعتمد على مراكز الفئات وليس على الحدود مباشرة.","كل فئة تمثل بنقطة من الشكل: مركز الفئة، تكرار الفئة.","نصل النقاط بخطوط مستقيمة، والفئة الأعلى تكرارًا تقابل أعلى نقطة."],
         formula:["\\(x_i=\\dfrac{b_{i-1}+b_i}{2}\\)، حيث \\(x_i\\) مركز الفئة.","نقطة المضلع التكراري هي \\((x_i,f_i)\\)، حيث \\(f_i\\) تكرار الفئة."],
         prompt:`أمامك المضلع التكراري التالي (\\(n=${n}\\)).<br/>(أ) اكتب مركز الفئة ذات أعلى تكرار.<br/>(ب) اكتب تكرارها.<br/>(ج) اختر العبارة الصحيحة عن المضلع التكراري.`,
         customUI:"graph",
@@ -2861,6 +2869,7 @@ const TEMPLATES = [
       const pick=randInt(r,2,k-1);
       const bi=classes[pick].U, Fi=F[pick];
       return {branches:[{
+        aiKey:"ogive",
         level:"صعب",
         explain:["المتجمع الصاعد يعني جمع التكرارات تدريجيًا من أول فئة حتى الفئة المطلوبة.","في منحنى المتجمع الصاعد نستخدم الحد الفعلي الأعلى للفئة على المحور الأفقي.","النقطة في المتجمع الصاعد تكون من الشكل: الحد الأعلى الفعلي، التكرار المتجمع الصاعد."],
         formula:["\\(F_i=f_1+f_2+\\cdots+f_i\\)، حيث \\(F_i\\) التكرار المتجمع الصاعد.","نقطة المتجمع الصاعد هي \\((b_i,F_i)\\)، حيث \\(b_i\\) الحد الفعلي الأعلى للفئة."],
@@ -2886,9 +2895,9 @@ const TEMPLATES = [
       const C=Math.ceil((R+1)/k);
       const lastUpper=minVal+k*C;
       return {branches:[
-        {level:"سهل", explain:["المدى هو الفرق بين أكبر قيمة وأصغر قيمة."], formula:["\\(R=x_{max}-x_{min}\\)، حيث \\(R\\) المدى."], prompt:`بيانات خام عددها ${n}، أصغرها ${minVal} وأكبرها ${maxVal}. احسب المدى.`, parts:[{key:"R", type:"number", label:"المدى R", step:"1"}], answers:{R}, solutionSteps:[`\\(R=${maxVal}-${minVal}=${R}\\).`,`إذن الإجابة الصحيحة هي: \\(R=${R}\\).`]},
-        {level:"متوسط", explain:["عدد الفئات يحسب من العلاقة المعطاة في الكتاب بأخذ الجزء الصحيح من الناتج."], formula:["\\(k=\\lfloor1.443\\ln(n)\\rfloor\\)، حيث \\(k\\) عدد الفئات و\\(n\\) عدد البيانات."], prompt:`إذا كان عدد المشاهدات \\(n=${n}\\)، احسب عدد الفئات المناسب.`, parts:[{key:"k", type:"number", label:"عدد الفئات k", step:"1"}], answers:{k}, solutionSteps:[`\\(1.443\\ln(${n})=${(1.443*Math.log(n)).toFixed(3)}\\).`,`إذن \\(k=\\lfloor${(1.443*Math.log(n)).toFixed(3)}\\rfloor=${k}\\).`]},
-        {level:"صعب", explain:["سعة الفئة تحسب بتقسيم المدى بعد إضافة 1 على عدد الفئات، ثم التقريب للأعلى.","عند بناء فئات فعلية متصلة لا نطرح 1 من الحد الأعلى؛ بل نستخدم الحد الأعلى = بداية الفئة + السعة."], formula:["\\(C=\\left\\lceil\\dfrac{R+1}{k}\\right\\rceil\\).","للفئات الفعلية المتصلة: \\(b_i=b_{i-1}+C\\)."], prompt:`إذا كان المدى \\(R=${R}\\) وعدد الفئات \\(k=${k}\\)، احسب سعة الفئة، ثم اكتب الحد الأعلى الفعلي لآخر فئة إذا بدأت الفئة الأولى من ${minVal}.`, parts:[{key:"C", type:"number", label:"سعة الفئة C", step:"1"},{key:"lastUpper", type:"number", label:"الحد الأعلى الفعلي لآخر فئة", step:"1"}], answers:{C,lastUpper}, solutionSteps:[`\\(C=\\left\\lceil\\dfrac{${R}+1}{${k}}\\right\\rceil=\\left\\lceil${((R+1)/k).toFixed(3)}\\right\\rceil=${C}\\).`,`الحد الأعلى الفعلي لآخر فئة = ${minVal}+(${k}×${C})=${lastUpper}.`,`إذن الإجابة الصحيحة هي: \\(C=${C}\\)، والحد الأعلى الفعلي لآخر فئة ${lastUpper}.`]}
+        {aiKey:"classBuild", level:"سهل", explain:["المدى هو الفرق بين أكبر قيمة وأصغر قيمة."], formula:["\\(R=x_{max}-x_{min}\\)، حيث \\(R\\) المدى."], prompt:`بيانات خام عددها ${n}، أصغرها ${minVal} وأكبرها ${maxVal}. احسب المدى.`, parts:[{key:"R", type:"number", label:"المدى R", step:"1"}], answers:{R}, solutionSteps:[`\\(R=${maxVal}-${minVal}=${R}\\).`,`إذن الإجابة الصحيحة هي: \\(R=${R}\\).`]},
+        {aiKey:"classBuild", level:"متوسط", explain:["عدد الفئات يحسب من العلاقة المعطاة في الكتاب بأخذ الجزء الصحيح من الناتج."], formula:["\\(k=\\lfloor1.443\\ln(n)\\rfloor\\)، حيث \\(k\\) عدد الفئات و\\(n\\) عدد البيانات."], prompt:`إذا كان عدد المشاهدات \\(n=${n}\\)، احسب عدد الفئات المناسب.`, parts:[{key:"k", type:"number", label:"عدد الفئات k", step:"1"}], answers:{k}, solutionSteps:[`\\(1.443\\ln(${n})=${(1.443*Math.log(n)).toFixed(3)}\\).`,`إذن \\(k=\\lfloor${(1.443*Math.log(n)).toFixed(3)}\\rfloor=${k}\\).`]},
+        {aiKey:"classBuild", level:"صعب", explain:["سعة الفئة تحسب بتقسيم المدى بعد إضافة 1 على عدد الفئات، ثم التقريب للأعلى.","عند بناء فئات فعلية متصلة لا نطرح 1 من الحد الأعلى؛ بل نستخدم الحد الأعلى = بداية الفئة + السعة."], formula:["\\(C=\\left\\lceil\\dfrac{R+1}{k}\\right\\rceil\\).","للفئات الفعلية المتصلة: \\(b_i=b_{i-1}+C\\)."], prompt:`إذا كان المدى \\(R=${R}\\) وعدد الفئات \\(k=${k}\\)، احسب سعة الفئة، ثم اكتب الحد الأعلى الفعلي لآخر فئة إذا بدأت الفئة الأولى من ${minVal}.`, parts:[{key:"C", type:"number", label:"سعة الفئة C", step:"1"},{key:"lastUpper", type:"number", label:"الحد الأعلى الفعلي لآخر فئة", step:"1"}], answers:{C,lastUpper}, solutionSteps:[`\\(C=\\left\\lceil\\dfrac{${R}+1}{${k}}\\right\\rceil=\\left\\lceil${((R+1)/k).toFixed(3)}\\right\\rceil=${C}\\).`,`الحد الأعلى الفعلي لآخر فئة = ${minVal}+(${k}×${C})=${lastUpper}.`,`إذن الإجابة الصحيحة هي: \\(C=${C}\\)، والحد الأعلى الفعلي لآخر فئة ${lastUpper}.`]}
       ]};
     }
   },
@@ -2905,9 +2914,9 @@ const TEMPLATES = [
       const xi=(classes[pick].L+classes[pick].U)/2;
       const next=classes[pick+1] || classes[pick];
       return {branches:[
-        {level:"سهل", explain:["مركز الفئة هو القيمة الواقعة في منتصف حدودها الفعلية.","لا نستخدم التكرار عند حساب مركز الفئة."], formula:["\\(x_i=\\dfrac{b_{i-1}+b_i}{2}\\)، حيث \\(x_i\\) مركز الفئة."], prompt:`الفئة الفعلية رقم ${pick+1} هي ${cuClassLabel(classes[pick])}. احسب مركز هذه الفئة.`, parts:[{key:"xi", type:"number", label:"مركز الفئة xᵢ", step:"0.5"}], answers:{xi}, solutionSteps:[`\\(x_i=\\dfrac{${classes[pick].L}+${classes[pick].U}}{2}=${xi}\\).`,`إذن الإجابة الصحيحة هي: \\(x_i=${xi}\\).`]},
-        {level:"متوسط", explain:["في الفئات الفعلية المتصلة، الحد الأعلى للفئة السابقة هو نفسه الحد الأدنى للفئة التالية.","لا نستخدم طرح أو إضافة 0.5 هنا لأن الفئات معطاة أصلًا كحدود فعلية متصلة."], formula:["إذا كانت الفئة \\(b_{i-1}\\) إلى \\(b_i\\)، فإن الفئة التالية تبدأ من \\(b_i\\).","\\(b_i=b_{i-1}+C\\)."], prompt:`إذا كانت الفئة الحالية هي ${cuClassLabel(classes[pick])} وسعة الفئة \\(C=${C}\\)، فاكتب حدود الفئة التالية.`, parts:[{key:"Lnext", type:"number", label:"الحد الأدنى للفئة التالية", step:"0.5"},{key:"Unext", type:"number", label:"الحد الأعلى للفئة التالية", step:"0.5"}], answers:{Lnext:next.L, Unext:next.U}, solutionSteps:[`نهاية الفئة الحالية هي ${classes[pick].U}، لذلك تبدأ الفئة التالية من ${next.L}.`,`الحد الأعلى للفئة التالية = ${next.L}+${C}=${next.U}.`,`إذن حدود الفئة التالية هي ${cuClassLabel(next)}.`]},
-        {level:"صعب", explain:["إذا عرفنا مركز الفئة وسعتها، فإن نصف السعة يكون على يمين ويسار المركز.","نستنتج الحد الأدنى بطرح نصف السعة من المركز، والحد الأعلى بإضافة نصف السعة."], formula:["\\(b_{i-1}=x_i-\\dfrac{C}{2}\\).","\\(b_i=x_i+\\dfrac{C}{2}\\)."], prompt:`فئة مركزها \\(x_i=${xi}\\) وسعتها \\(C=${C}\\). استنتج حدها الأدنى الفعلي وحدها الأعلى الفعلي.`, parts:[{key:"L", type:"number", label:"الحد الأدنى الفعلي", step:"0.5"},{key:"U", type:"number", label:"الحد الأعلى الفعلي", step:"0.5"}], answers:{L:classes[pick].L, U:classes[pick].U}, solutionSteps:[`نصف السعة = ${C}/2 = ${C/2}.`,`\\(b_{i-1}=${xi}-${C/2}=${classes[pick].L}\\).`,`\\(b_i=${xi}+${C/2}=${classes[pick].U}\\).`,`إذن حدود الفئة هي ${cuClassLabel(classes[pick])}.`]}
+        {aiKey:"mid", level:"سهل", explain:["مركز الفئة هو القيمة الواقعة في منتصف حدودها الفعلية.","لا نستخدم التكرار عند حساب مركز الفئة."], formula:["\\(x_i=\\dfrac{b_{i-1}+b_i}{2}\\)، حيث \\(x_i\\) مركز الفئة."], prompt:`الفئة الفعلية رقم ${pick+1} هي ${cuClassLabel(classes[pick])}. احسب مركز هذه الفئة.`, parts:[{key:"xi", type:"number", label:"مركز الفئة xᵢ", step:"0.5"}], answers:{xi}, solutionSteps:[`\\(x_i=\\dfrac{${classes[pick].L}+${classes[pick].U}}{2}=${xi}\\).`,`إذن الإجابة الصحيحة هي: \\(x_i=${xi}\\).`]},
+        {aiKey:"classBounds", level:"متوسط", explain:["في الفئات الفعلية المتصلة، الحد الأعلى للفئة السابقة هو نفسه الحد الأدنى للفئة التالية.","لا نستخدم طرح أو إضافة 0.5 هنا لأن الفئات معطاة أصلًا كحدود فعلية متصلة."], formula:["إذا كانت الفئة \\(b_{i-1}\\) إلى \\(b_i\\)، فإن الفئة التالية تبدأ من \\(b_i\\).","\\(b_i=b_{i-1}+C\\)."], prompt:`إذا كانت الفئة الحالية هي ${cuClassLabel(classes[pick])} وسعة الفئة \\(C=${C}\\)، فاكتب حدود الفئة التالية.`, parts:[{key:"Lnext", type:"number", label:"الحد الأدنى للفئة التالية", step:"0.5"},{key:"Unext", type:"number", label:"الحد الأعلى للفئة التالية", step:"0.5"}], answers:{Lnext:next.L, Unext:next.U}, solutionSteps:[`نهاية الفئة الحالية هي ${classes[pick].U}، لذلك تبدأ الفئة التالية من ${next.L}.`,`الحد الأعلى للفئة التالية = ${next.L}+${C}=${next.U}.`,`إذن حدود الفئة التالية هي ${cuClassLabel(next)}.`]},
+        {aiKey:"classBounds", level:"صعب", explain:["إذا عرفنا مركز الفئة وسعتها، فإن نصف السعة يكون على يمين ويسار المركز.","نستنتج الحد الأدنى بطرح نصف السعة من المركز، والحد الأعلى بإضافة نصف السعة."], formula:["\\(b_{i-1}=x_i-\\dfrac{C}{2}\\).","\\(b_i=x_i+\\dfrac{C}{2}\\)."], prompt:`فئة مركزها \\(x_i=${xi}\\) وسعتها \\(C=${C}\\). استنتج حدها الأدنى الفعلي وحدها الأعلى الفعلي.`, parts:[{key:"L", type:"number", label:"الحد الأدنى الفعلي", step:"0.5"},{key:"U", type:"number", label:"الحد الأعلى الفعلي", step:"0.5"}], answers:{L:classes[pick].L, U:classes[pick].U}, solutionSteps:[`نصف السعة = ${C}/2 = ${C/2}.`,`\\(b_{i-1}=${xi}-${C/2}=${classes[pick].L}\\).`,`\\(b_i=${xi}+${C/2}=${classes[pick].U}\\).`,`إذن حدود الفئة هي ${cuClassLabel(classes[pick])}.`]}
       ]};
     }
   },
@@ -2926,9 +2935,9 @@ const TEMPLATES = [
       ];
       const picked=cases[randInt(r,0,cases.length-1)];
       return {branches:[
-        {level:"سهل", explain:["اختيار الرسم يعتمد على نوع البيانات والهدف من السؤال.","للفئات الفعلية المتصلة نستخدم المدرج عند المقارنة بين التكرارات."], formula:["المدرج التكراري = فئات فعلية متصلة + أعمدة متلاصقة.","المضلع التكراري = \\((x_i,f_i)\\).","المتجمع الصاعد = \\((b_i,F_i)\\)."], prompt:`ما الرسم الأنسب إذا كان الهدف: ${picked.goal}؟`, parts:[{key:"graph", type:"mcq", label:"الرسم المناسب", options:["مدرج تكراري","مضلع تكراري","منحنى متجمع صاعد","أعمدة"]}], answers:{graph:picked.graph}, solutionSteps:[`الرسم الأنسب هو ${picked.graph}.`,`السبب: ${picked.why}`,`إذن الإجابة الصحيحة هي: ${picked.graph}.`]},
-        {level:"متوسط", explain:["الرسم الذي يعتمد على مراكز الفئات هو المضلع التكراري.","نحسب مركز كل فئة ثم نمثل النقطة مع تكرارها."], formula:["\\(x_i=\\dfrac{b_{i-1}+b_i}{2}\\).","نقطة المضلع التكراري = \\((x_i,f_i)\\)."], prompt:"أي رسم يعتمد أساسًا على مراكز الفئات؟", parts:[{key:"centerGraph", type:"mcq", label:"الرسم", options:["مدرج تكراري","مضلع تكراري","منحنى متجمع صاعد","قرص دائري"]}], answers:{centerGraph:"مضلع تكراري"}, solutionSteps:["الرسم الذي يعتمد على مراكز الفئات هو المضلع التكراري.","إذن الإجابة الصحيحة هي: مضلع تكراري."]},
-        {level:"صعب", explain:["إذا كان المطلوب معرفة عدد القيم حتى حد معين، فهذا هدف المتجمع الصاعد.","نستخدم الحد الأعلى الفعلي مع التكرار المتجمع الصاعد."], formula:["نقطة المتجمع الصاعد = \\((b_i,F_i)\\)."], prompt:"أي رسم تستخدم لتقدير عدد القيم الأقل من أو يساوي حد فئة معين؟", parts:[{key:"cumGraph", type:"mcq", label:"الرسم", options:["مدرج تكراري","مضلع تكراري","منحنى متجمع صاعد","أعمدة"]}], answers:{cumGraph:"منحنى متجمع صاعد"}, solutionSteps:["الرسم المستخدم هو منحنى المتجمع الصاعد.","إذن الإجابة الصحيحة هي: منحنى متجمع صاعد."]}
+        {aiKey:"graphChoice", level:"سهل", explain:["اختيار الرسم يعتمد على نوع البيانات والهدف من السؤال.","للفئات الفعلية المتصلة نستخدم المدرج عند المقارنة بين التكرارات."], formula:["المدرج التكراري = فئات فعلية متصلة + أعمدة متلاصقة.","المضلع التكراري = \\((x_i,f_i)\\).","المتجمع الصاعد = \\((b_i,F_i)\\)."], prompt:`ما الرسم الأنسب إذا كان الهدف: ${picked.goal}؟`, parts:[{key:"graph", type:"mcq", label:"الرسم المناسب", options:["مدرج تكراري","مضلع تكراري","منحنى متجمع صاعد","أعمدة"]}], answers:{graph:picked.graph}, solutionSteps:[`الرسم الأنسب هو ${picked.graph}.`,`السبب: ${picked.why}`,`إذن الإجابة الصحيحة هي: ${picked.graph}.`]},
+        {aiKey:"poly", level:"متوسط", explain:["الرسم الذي يعتمد على مراكز الفئات هو المضلع التكراري.","نحسب مركز كل فئة ثم نمثل النقطة مع تكرارها."], formula:["\\(x_i=\\dfrac{b_{i-1}+b_i}{2}\\).","نقطة المضلع التكراري = \\((x_i,f_i)\\)."], prompt:"أي رسم يعتمد أساسًا على مراكز الفئات؟", parts:[{key:"centerGraph", type:"mcq", label:"الرسم", options:["مدرج تكراري","مضلع تكراري","منحنى متجمع صاعد","قرص دائري"]}], answers:{centerGraph:"مضلع تكراري"}, solutionSteps:["الرسم الذي يعتمد على مراكز الفئات هو المضلع التكراري.","إذن الإجابة الصحيحة هي: مضلع تكراري."]},
+        {aiKey:"ogive", level:"صعب", explain:["إذا كان المطلوب معرفة عدد القيم حتى حد معين، فهذا هدف المتجمع الصاعد.","نستخدم الحد الأعلى الفعلي مع التكرار المتجمع الصاعد."], formula:["نقطة المتجمع الصاعد = \\((b_i,F_i)\\)."], prompt:"أي رسم تستخدم لتقدير عدد القيم الأقل من أو يساوي حد فئة معين؟", parts:[{key:"cumGraph", type:"mcq", label:"الرسم", options:["مدرج تكراري","مضلع تكراري","منحنى متجمع صاعد","أعمدة"]}], answers:{cumGraph:"منحنى متجمع صاعد"}, solutionSteps:["الرسم المستخدم هو منحنى المتجمع الصاعد.","إذن الإجابة الصحيحة هي: منحنى متجمع صاعد."]}
       ]};
     }
   },
@@ -2948,9 +2957,9 @@ const TEMPLATES = [
       const cumPhi=+(Fi/n).toFixed(3);
       const cumPct=+((Fi/n)*100).toFixed(1);
       return {branches:[
-        {level:"سهل", explain:["التكرار المتجمع الصاعد هو جمع التكرارات من أول فئة حتى الفئة المطلوبة شاملة."], formula:["\\(F_i=f_1+f_2+\\cdots+f_i\\)."], prompt:`احسب التكرار المتجمع الصاعد \\(F_i\\) حتى الفئة ${cuClassLabel(classes[pick])}.`, customUI:"freqTable", table:{headers:["الفئة الفعلية","\\(f_i\\)"], rows:classes.map((item,i)=>({label:cuClassLabel(item), fixed:[String(counts[i])]}))}, parts:[{key:"Fi", type:"number", label:"التكرار المتجمع Fᵢ", step:"1"}], answers:{Fi}, solutionSteps:[`\\(F_i=${counts.slice(0,pick+1).join("+")}=${Fi}\\).`,`إذن الإجابة الصحيحة هي: \\(F_i=${Fi}\\).`]},
-        {level:"متوسط", explain:["التكرار النسبي المتجمع يعني قسمة التكرار المتجمع الصاعد على المجموع الكلي.","لا نضرب في 100 إلا إذا طُلب التكرار المئوي المتجمع."], formula:["التكرار النسبي المتجمع \\(=\\dfrac{F_i}{n}\\)."], prompt:`إذا كان \\(F_i=${Fi}\\) والمجموع \\(n=${n}\\)، احسب التكرار النسبي المتجمع.`, parts:[{key:"cumPhi", type:"number", label:"التكرار النسبي المتجمع", step:"0.001"}], answers:{cumPhi}, solutionSteps:[`التكرار النسبي المتجمع \\(=\\dfrac{${Fi}}{${n}}=${cumPhi}\\).`,`إذن الإجابة الصحيحة هي: ${cumPhi}.`]},
-        {level:"صعب", explain:["التكرار المئوي المتجمع هو التكرار النسبي المتجمع مضروبًا في 100%."], formula:["التكرار المئوي المتجمع \\(=\\dfrac{F_i}{n}\\times100\\%\\)."], prompt:`إذا كان \\(F_i=${Fi}\\) والمجموع \\(n=${n}\\)، احسب التكرار المئوي المتجمع.`, parts:[{key:"cumPct", type:"number", label:"التكرار المئوي المتجمع %", step:"0.1"}], answers:{cumPct}, solutionSteps:[`التكرار المئوي المتجمع \\(=\\dfrac{${Fi}}{${n}}\\times100\\%=${cumPct}\\%\\).`,`إذن الإجابة الصحيحة هي: ${cumPct}%.`]}
+        {aiKey:"cum", level:"سهل", explain:["التكرار المتجمع الصاعد هو جمع التكرارات من أول فئة حتى الفئة المطلوبة شاملة."], formula:["\\(F_i=f_1+f_2+\\cdots+f_i\\)."], prompt:`احسب التكرار المتجمع الصاعد \\(F_i\\) حتى الفئة ${cuClassLabel(classes[pick])}.`, customUI:"freqTable", table:{headers:["الفئة الفعلية","\\(f_i\\)"], rows:classes.map((item,i)=>({label:cuClassLabel(item), fixed:[String(counts[i])]}))}, parts:[{key:"Fi", type:"number", label:"التكرار المتجمع Fᵢ", step:"1"}], answers:{Fi}, solutionSteps:[`\\(F_i=${counts.slice(0,pick+1).join("+")}=${Fi}\\).`,`إذن الإجابة الصحيحة هي: \\(F_i=${Fi}\\).`]},
+        {aiKey:"cumRel", level:"متوسط", explain:["التكرار النسبي المتجمع يعني قسمة التكرار المتجمع الصاعد على المجموع الكلي.","لا نضرب في 100 إلا إذا طُلب التكرار المئوي المتجمع."], formula:["التكرار النسبي المتجمع \\(=\\dfrac{F_i}{n}\\)."], prompt:`إذا كان \\(F_i=${Fi}\\) والمجموع \\(n=${n}\\)، احسب التكرار النسبي المتجمع.`, parts:[{key:"cumPhi", type:"number", label:"التكرار النسبي المتجمع", step:"0.001"}], answers:{cumPhi}, solutionSteps:[`التكرار النسبي المتجمع \\(=\\dfrac{${Fi}}{${n}}=${cumPhi}\\).`,`إذن الإجابة الصحيحة هي: ${cumPhi}.`]},
+        {aiKey:"cumPct", level:"صعب", explain:["التكرار المئوي المتجمع هو التكرار النسبي المتجمع مضروبًا في 100%."], formula:["التكرار المئوي المتجمع \\(=\\dfrac{F_i}{n}\\times100\\%\\)."], prompt:`إذا كان \\(F_i=${Fi}\\) والمجموع \\(n=${n}\\)، احسب التكرار المئوي المتجمع.`, parts:[{key:"cumPct", type:"number", label:"التكرار المئوي المتجمع %", step:"0.1"}], answers:{cumPct}, solutionSteps:[`التكرار المئوي المتجمع \\(=\\dfrac{${Fi}}{${n}}\\times100\\%=${cumPct}\\%\\).`,`إذن الإجابة الصحيحة هي: ${cumPct}%.`]}
       ]};
     }
   },
@@ -2971,10 +2980,10 @@ const TEMPLATES = [
       const xi=(classes[maxIndex].L+classes[maxIndex].U)/2;
       const phi=+(maxCount/n).toFixed(3);
       return {branches:[
-        {level:"سهل", explain:["الفئة الأعلى تكرارًا هي الفئة التي لها أكبر قيمة في عمود التكرار.","التكرارات مولّدة هنا بحيث لا يوجد تعادل، لذلك الجواب فئة واحدة فقط."], formula:["الفئة الأعلى تكرارًا هي الفئة التي تمتلك أكبر \\(f_i\\)."], prompt:"حدّد الفئة الأعلى تكرارًا في الجدول.", customUI:"freqTable", table:{headers:["الفئة الفعلية","\\(f_i\\)"], rows:classes.map((item,i)=>({label:cuClassLabel(item), fixed:[String(counts[i])]}))}, parts:[{key:"modalClass", type:"mcq", label:"الفئة الأعلى", options:classes.map(cuClassLabel)}], answers:{modalClass}, solutionSteps:[`نقارن قيم \\(f_i\\) في الجدول.`,`أكبر تكرار هو \\(f_i=${maxCount}\\).`,`إذن الإجابة الصحيحة هي: الفئة ${modalClass}.`]},
-        {level:"متوسط", explain:["مركز الفئة هو منتصف الحدين الفعليين للفئة الأعلى تكرارًا.","لا يعتمد مركز الفئة على التكرار، بل على الحدود الفعلية."], formula:["\\(x_i=\\dfrac{b_{i-1}+b_i}{2}\\)."], prompt:`احسب مركز الفئة الأعلى تكرارًا ${modalClass}.`, parts:[{key:"xi", type:"number", label:"مركز الفئة xᵢ", step:"0.5"}], answers:{xi}, solutionSteps:[`الفئة الأعلى تكرارًا هي ${modalClass}.`,`\\(x_i=\\dfrac{${classes[maxIndex].L}+${classes[maxIndex].U}}{2}=${xi}\\).`,`إذن الإجابة الصحيحة هي: \\(x_i=${xi}\\).`]},
-        {level:"صعب", explain:["نقطة هذه الفئة في المضلع التكراري تتكون من مركز الفئة وتكرارها.","الإحداثي الأول هو مركز الفئة، والإحداثي الثاني هو التكرار."], formula:["نقطة المضلع التكراري = \\((x_i,f_i)\\)."], prompt:`ما نقطة الفئة الأعلى تكرارًا ${modalClass} في المضلع التكراري؟`, parts:[{key:"x", type:"number", label:"الإحداثي الأول xᵢ", step:"0.5"},{key:"y", type:"number", label:"الإحداثي الثاني fᵢ", step:"1"}], answers:{x:xi,y:maxCount}, solutionSteps:[`مركز الفئة الأعلى تكرارًا هو \\(x_i=${xi}\\).`,`تكرارها هو \\(f_i=${maxCount}\\).`,`إذن نقطة هذه الفئة في المضلع التكراري هي \\((x_i,f_i)=(${xi},${maxCount})\\).`]},
-        {level:"متوسط", explain:["التكرار النسبي للفئة الأعلى تكرارًا يساوي تكرارها مقسومًا على مجموع التكرارات."], formula:["\\(\\phi_i=\\dfrac{f_i}{n}\\)."], prompt:`احسب التكرار النسبي \\(\\phi_i\\) للفئة الأعلى تكرارًا ${modalClass}.`, parts:[{key:"phi", type:"number", label:"التكرار النسبي φᵢ", step:"0.001"}], answers:{phi}, solutionSteps:[`\\(\\phi_i=\\dfrac{${maxCount}}{${n}}=${phi}\\).`,`إذن الإجابة الصحيحة هي: \\(\\phi_i=${phi}\\).`]}
+        {aiKey:"mostClass", level:"سهل", explain:["الفئة الأعلى تكرارًا هي الفئة التي لها أكبر قيمة في عمود التكرار.","نقارن قيم التكرارات في الجدول ثم نحدد الفئة الأعلى تكرارًا."], formula:["الفئة الأعلى تكرارًا هي الفئة التي تمتلك أكبر \\(f_i\\)."], prompt:"حدّد الفئة الأعلى تكرارًا في الجدول.", customUI:"freqTable", table:{headers:["الفئة الفعلية","\\(f_i\\)"], rows:classes.map((item,i)=>({label:cuClassLabel(item), fixed:[String(counts[i])]}))}, parts:[{key:"modalClass", type:"mcq", label:"الفئة الأعلى", options:classes.map(cuClassLabel)}], answers:{modalClass}, solutionSteps:[`نقارن قيم \\(f_i\\) في الجدول.`,`أكبر تكرار هو \\(f_i=${maxCount}\\).`,`إذن الإجابة الصحيحة هي: الفئة ${modalClass}.`]},
+        {aiKey:"mid", level:"متوسط", explain:["مركز الفئة هو منتصف الحدين الفعليين للفئة الأعلى تكرارًا.","لا يعتمد مركز الفئة على التكرار، بل على الحدود الفعلية."], formula:["\\(x_i=\\dfrac{b_{i-1}+b_i}{2}\\)."], prompt:`احسب مركز الفئة الأعلى تكرارًا ${modalClass}.`, parts:[{key:"xi", type:"number", label:"مركز الفئة xᵢ", step:"0.5"}], answers:{xi}, solutionSteps:[`الفئة الأعلى تكرارًا هي ${modalClass}.`,`\\(x_i=\\dfrac{${classes[maxIndex].L}+${classes[maxIndex].U}}{2}=${xi}\\).`,`إذن الإجابة الصحيحة هي: \\(x_i=${xi}\\).`]},
+        {aiKey:"poly", level:"صعب", explain:["نقطة هذه الفئة في المضلع التكراري تتكون من مركز الفئة وتكرارها.","الإحداثي الأول هو مركز الفئة، والإحداثي الثاني هو التكرار."], formula:["نقطة المضلع التكراري = \\((x_i,f_i)\\)."], prompt:`ما نقطة الفئة الأعلى تكرارًا ${modalClass} في المضلع التكراري؟`, parts:[{key:"x", type:"number", label:"الإحداثي الأول xᵢ", step:"0.5"},{key:"y", type:"number", label:"الإحداثي الثاني fᵢ", step:"1"}], answers:{x:xi,y:maxCount}, solutionSteps:[`مركز الفئة الأعلى تكرارًا هو \\(x_i=${xi}\\).`,`تكرارها هو \\(f_i=${maxCount}\\).`,`إذن نقطة هذه الفئة في المضلع التكراري هي \\((x_i,f_i)=(${xi},${maxCount})\\).`]},
+        {aiKey:"rel", level:"متوسط", explain:["التكرار النسبي للفئة الأعلى تكرارًا يساوي تكرارها مقسومًا على مجموع التكرارات."], formula:["\\(\\phi_i=\\dfrac{f_i}{n}\\)."], prompt:`احسب التكرار النسبي \\(\\phi_i\\) للفئة الأعلى تكرارًا ${modalClass}.`, parts:[{key:"phi", type:"number", label:"التكرار النسبي φᵢ", step:"0.001"}], answers:{phi}, solutionSteps:[`\\(\\phi_i=\\dfrac{${maxCount}}{${n}}=${phi}\\).`,`إذن الإجابة الصحيحة هي: \\(\\phi_i=${phi}\\).`]}
       ]};
     }
   }
@@ -6660,7 +6669,14 @@ window.__examRunning = isExamStarted();
   .cu32-empty{border:1px dashed #cbd5e1;border-radius:16px;background:#fff;padding:18px;color:#64748b;text-align:center;font-weight:800;line-height:1.9;}
   .cu32-card{background:#fff;border:1px solid #dbeafe;border-radius:17px;box-shadow:0 8px 22px rgba(15,23,42,.06);padding:12px 13px;opacity:0;transform:translateY(8px);transition:.24s ease;}
   .cu32-card.on{opacity:1;transform:translateY(0)}.cu32-card-title{color:#0369a1;font-weight:1000;font-size:13px;margin-bottom:8px;display:flex;align-items:center;gap:6px}.cu32-card-title:before{content:"";width:7px;height:7px;border-radius:50%;background:#0284c7;display:inline-block;}
-  .cu32-card-body{font-size:13.5px;line-height:2.05;color:#0f172a;font-weight:850}.cu32-card-body p{margin:6px 0}.cu32-card-body .cu32-line{margin:8px 0}.cu32-card-body .cu32-math-line{direction:ltr;unicode-bidi:isolate;text-align:center;overflow-x:auto;margin:10px 0;padding:4px 0}.cu32-card-body .katex{font-size:1.08em}.cu32-card-body .katex-display{margin:.35em 0!important;overflow-x:auto;overflow-y:hidden}.cu32-card-body .katex-html{direction:ltr;unicode-bidi:isolate}
+  .cu32-card-body{font-size:13.5px;line-height:2.05;color:#0f172a;font-weight:850}.cu32-card-body p{margin:6px 0}.cu32-card-body .cu32-line{margin:8px 0}.cu32-card-body .cu32-math-line{direction:ltr;unicode-bidi:isolate;text-align:center;overflow-x:auto;margin:10px 0;padding:4px 0}
+  /* V40 readable math spacing */
+  .cu32-card-body .cu32-line{margin:12px 0!important;}
+  .cu32-card-body .cu-math-aware{line-height:2.45!important;}
+  .cu32-card-body .cu-formula{margin:0 .32em;vertical-align:middle;}
+  .cu32-card-body .cu-formula-block{margin:12px auto!important;padding:7px 10px;display:flex!important;justify-content:center;align-items:center;width:max-content;max-width:100%;}
+  .cu32-card-body .cu-frac{margin:0 .15em;}
+.cu32-card-body .katex{font-size:1.08em}.cu32-card-body .katex-display{margin:.35em 0!important;overflow-x:auto;overflow-y:hidden}.cu32-card-body .katex-html{direction:ltr;unicode-bidi:isolate}
   .cu32-typing{display:inline-flex;gap:4px;border:1px solid #e2e8f0;border-radius:16px;padding:10px 12px;background:#fff;margin:8px 0;width:max-content}.cu32-typing span{width:6px;height:6px;border-radius:50%;background:#94a3b8;animation:cu32blink 1s infinite ease-in-out}.cu32-typing span:nth-child(2){animation-delay:.15s}.cu32-typing span:nth-child(3){animation-delay:.3s}@keyframes cu32blink{0%,80%,100%{opacity:.25;transform:translateY(0)}40%{opacity:1;transform:translateY(-3px)}}
   .cu32-actions{padding:10px 12px;border-top:1px solid #e2e8f0;background:#fff;display:grid;grid-template-columns:1fr 1fr;gap:8px;}.cu32-actions button{border:1px solid #cfe0ee;background:#fff;border-radius:12px;padding:9px 10px;font-family:inherit;font-size:12.5px;font-weight:900;cursor:pointer;color:#0f172a}.cu32-actions button:hover{background:#f0f9ff;border-color:#7dd3fc}.cu32-actions button[disabled]{opacity:.43!important;cursor:not-allowed!important;background:#f8fafc!important;}
   @media(max-width:760px){.topbar .row{padding-right:62px!important;padding-left:62px!important}.coreup-v32-header-logo{right:8px!important;width:34px!important;height:34px!important}.coreup-v32-header-logo img{width:25px!important;height:25px!important}.logoWrap{left:8px!important}.logoWrap img{max-height:34px!important}#cu32Drawer{left:8px;bottom:70px;width:calc(100vw - 16px)}#cu32Launcher{left:10px;bottom:10px}}
@@ -6857,41 +6873,63 @@ window.__examRunning = isExamStarted();
       }
     }catch(e){}
   }
+
   function keyOf(p){
-    var b=(p&&p.b)||{}, qid=questionId(p), bi=branchIndex(p), text=[branchTitle(p), b.prompt||'', A(b.parts).map(function(x){return (x.label||'')+' '+(x.key||'');}).join(' '), A(p&&p.wrongItems).map(function(x){return (x.key||'')+' '+(x.label||'');}).join(' ')].join(' ').toLowerCase();
-    if(lessonId(p)==='2.1'){
-      if(qid==='q1') return bi===0?'relPctCum':(bi===1?'most':'pct');
-      if(qid==='q2') return bi===0?'rel':(bi===1?'pct':'pie');
-      if(qid==='q3') return bi===0?'most':(bi===1?'pie':'relPctCum');
-      if(qid==='q4'||qid==='q5') return 'stem';
-      if(qid==='q6') return bi===0?'pct':(bi===1?'rel':'pie');
-      if(qid==='q7') return bi===0?'pie':(bi===1?'pie':'pct');
-      if(qid==='q8') return 'datatype';
+    var b=(p&&p.b)||{};
+    if(b.aiKey) return b.aiKey;
+    var parts=A(b.parts);
+    var keys=parts.map(function(x){return String((x&&x.key)||'');});
+    function has(k){return keys.indexOf(k)>=0;}
+    function hasAny(arr){return arr.some(function(k){return has(k);});}
+    var labels=parts.map(function(x){return (x&&x.label)||'';}).join(' ');
+    var answers=''; try{ answers=JSON.stringify(b.answers||{}); }catch(e){}
+    var text=norm([branchTitle(p), b.prompt||'', labels, A(b.explain).join(' '), A(b.formula).join(' '), answers].join(' ')).toLowerCase();
+    var qid=questionId(p), bi=branchIndex(p), les=lessonId(p);
+    var branchOnly=norm([b.prompt||'', labels, answers].join(' ')).toLowerCase();
+
+    if(/التكرار المئوي المتجمع|المئوي المتجمع|cumPct/.test(branchOnly)) return 'cumPct';
+    if(/التكرار النسبي المتجمع|النسبي المتجمع|cumPhi/.test(branchOnly)) return 'cumRel';
+    if(/التكرار المئوي|النسبة المئوية|مئوية|%/.test(branchOnly) && !/متجمع/.test(branchOnly)) return 'pct';
+    if(/التكرار النسبي|relative|φ|phi/.test(branchOnly) && !/متجمع/.test(branchOnly) && !/مئوي|%/.test(branchOnly)) return 'rel';
+    if(/التكرار المتجمع الصاعد|Fᵢ|F_i/.test(branchOnly) && !/نقطة/.test(branchOnly)) return 'cum';
+
+    /* الأولوية دائمًا لمفاتيح الفرع نفسه، وليس رقم السؤال العام. */
+    if(hasAny(['o_freq','o_rel','o_pct'])) return 'relPctCum';
+    if(has('phi') && has('pct') && has('Fi')) return 'relPctCum';
+    if(has('cumPct')) return 'cumPct';
+    if(has('cumPhi')) return 'cumRel';
+    if(has('pct') && /مئوي|%|percentage/.test(text)) return 'pct';
+    if((has('phi')||has('rel')) && !has('pct') && !has('Fi')) return 'rel';
+    if(has('Fi') && !has('x') && !has('y')) return 'cum';
+
+    if(hasAny(['L1','U1','Lx','Ux','Lnext','Unext','L','U']) || /حدود الفئة|الحد الأدنى|الحد الأعلى|الفئة التالية/.test(text)) return 'classBounds';
+    if(hasAny(['R','k','C','lastUpper']) || /المدى|عدد الفئات|سعة الفئة|x_\{?max\}?|x_\{?min\}?/.test(text)) return 'classBuild';
+
+    if(has('graph') || has('centerGraph') || has('cumGraph')){
+      if(/مضلع/.test(text) || /مضلع/.test(answers)) return 'poly';
+      if(/متجمع|ogive/.test(text) || /متجمع/.test(answers)) return 'ogive';
+      if(/أعمدة|اعمدة|نوعية/.test(text) || /أعمدة/.test(answers)) return 'bar';
+      return 'hist';
     }
-    if(lessonId(p)==='2.2'){
-      if(qid==='q1'||/سعة|عدد الفئات|range|مدى/.test(text)) return 'classBuild';
-      if(qid==='q2'||/حدود|مركز/.test(text)) return 'classBounds';
-      if(qid==='q3') return 'relPctCum';
-      if(qid==='q4'||/مدرج|histogram/.test(text)) return 'hist';
-      if(qid==='q5'||/مضلع/.test(text)) return 'poly';
-      if(qid==='q6'||/ogive|متجمع صاعد/.test(text)) return 'ogive';
-      if(qid==='q7') return 'classBuild';
-      if(qid==='q8') return bi===0?'mid':(bi===1?'classBounds':'relPctCum');
-      if(qid==='q9') return bi===0?'hist':(bi===1?'poly':'ogive');
-      if(qid==='q10') return 'cumPct';
-      if(qid==='q11') return bi===3?'poly':'mostClass';
-    }
-    if(/قطاع|دائر|زاوية|θ|theta/.test(text)) return 'pie';
+
+    if(has('modalClass') || has('peak') || /الفئة الأعلى|الأعلى تكرارًا|اعلى تكرار|أكبر تكرار|اقل تكرار|الأقل تكرارًا/.test(text)) return 'mostClass';
+    if(has('peakF') || (has('fi') && /تكرارها|ما تكرار الفئة|تكرار الفئة/.test(text) && !/مضلع|نقطة/.test(text))) return 'readFreq';
+    if(has('concept') || (has('xi') && has('fi'))) return 'poly';
+    if(has('x') && has('y') && /مضلع/.test(text)) return 'poly';
+    if(has('x') && has('y') && /متجمع|ogive|b_i|الحد الأعلى/.test(text)) return 'ogive';
+    if(hasAny(['xi','x_i']) || /مركز الفئة|مركزها|x_i/.test(text)) return 'mid';
+
+    if(/قطاع|دائر|زاوية|θ|theta|360/.test(text)) return 'pie';
     if(/ساق|ورقة|أوراق/.test(text)) return 'stem';
-    if(/الأكثر|الأقل|أكبر تكرار|أصغر تكرار|highest|least|most/.test(text)) return 'most';
-    if(/مركز|center/.test(text)) return 'mid';
+    if(/نوع البيانات|تمثيل مناسب|نوعي|تقدير الطالب/.test(text)) return 'datatype';
     if(/متجمع|cumulative/.test(text)) return 'cum';
-    if(/نسبة مئوية|مئوية|pct|%/.test(text)) return 'pct';
-    if(/تكرار نسبي|relative|rel/.test(text)) return 'rel';
-    if(/فئة|حد|سعة|class/.test(text)) return 'classBounds';
-    if(/نوع البيانات|تمثيل مناسب|نوعي|مدرج/.test(text)) return 'datatype';
+    if(/التكرار المئوي|النسبة المئوية|مئوية|%/.test(text)) return 'pct';
+    if(/تكرار نسبي|relative/.test(text)) return 'rel';
+    if(/مدرج|histogram/.test(text)) return 'hist';
+    if(/مضلع/.test(text)) return 'poly';
     return 'general';
   }
+
   function uniqueLabels(items){
     var map={o_freq:'تكرار فصيلة O',o_rel:'التكرار النسبي لفصيلة O',o_pct:'التكرار المئوي لفصيلة O',freq:'التكرار',rel:'التكرار النسبي',pct:'التكرار المئوي'};
     var out=[]; A(items).forEach(function(it){var k=String(it.key||''); var lab=norm(stripHtml(it.label||'')); if(map[k]) lab=map[k]; if(!lab || lab==='قيمة داخل الجدول') lab=map[k]||('الخانة '+k); if(lab && out.indexOf(lab)<0) out.push(lab);});
@@ -6904,64 +6942,94 @@ window.__examRunning = isExamStarted();
     else if(k==='rel') out.push(String.raw`راجع القانون \\(\\phi_i=\\dfrac{f_i}{n}\\)، ولا تضرب في 100 عند التكرار النسبي.`);
     else if(k==='cum'||k==='ogive') out.push(String.raw`راجع جمع التكرارات من البداية حتى الفئة المطلوبة للحصول على \\(F_i\\).`);
     else if(k==='classBuild'||k==='classBounds') out.push(String.raw`راجع قاعدة الفئات الفعلية المتصلة: \\(b_i=b_{i-1}+C\\) دون طرح 1.`);
-    else if(k==='most'||k==='mostClass') out.push(String.raw`راجع عمود \\(f_i\\)، واختر فئة واحدة فقط لأن التكرارات لا تتعادل.`);
+    else if(k==='most'||k==='mostClass') out.push(String.raw`راجع عمود \\(f_i\\)، ثم حدّد الفئة المطلوبة من خلال أكبر أو أصغر تكرار.`);
     else out.push('راجع المطلوب، ثم اختر القاعدة المناسبة قبل التعويض.');
     return out;
   }
+
+  function cleanStudentLine(s){
+    s=norm(s);
+    s=s.replace(/،?\s*ولا يوجد تعادل[^.،؛]*/g,'');
+    s=s.replace(/،?\s*لا يوجد تعادل[^.،؛]*/g,'');
+    s=s.replace(/،?\s*تم توليد[^.،؛]*تعادل[^.،؛]*/g,'');
+    s=s.replace(/،?\s*بحيث يكون الجواب واحدًا[^.،؛]*/g,'');
+    s=s.replace(/\s{2,}/g,' ').trim();
+    return s;
+  }
   function explainLines(p){
+    var direct=A(p&&p.b&&p.b.explain).map(cleanStudentLine).filter(Boolean);
+    if(direct.length) return direct;
     var k=keyOf(p);
-    if(k==='classBuild') return ['نحدد أولًا أصغر قيمة وأكبر قيمة، ثم نحسب المدى، وبعد ذلك نحدد عدد الفئات وسعة الفئة.','عند بناء الفئات في هذا الدرس نستخدم فئات فعلية متصلة؛ أي أن نهاية الفئة السابقة هي بداية الفئة التالية.','لا نطرح 1 من الحد الأعلى، لأن الفئات هنا ليست منفصلة بل متصلة.'];
+    if(k==='graphChoice') return ['نحدد الهدف من الرسم أولًا: مقارنة تكرارات، مراكز فئات، متجمع صاعد، أو بيانات نوعية.', 'لكل هدف رسم مناسب مختلف، لذلك لا نستخدم قانونًا حسابيًا هنا بل نطابق الهدف مع نوع الرسم.'];
+    if(k==='classBuild') return ['نحدد أصغر قيمة وأكبر قيمة، ثم نحسب المدى، وبعد ذلك نحدد عدد الفئات وسعة الفئة.','عند بناء الفئات في هذا الدرس نستخدم فئات فعلية متصلة؛ أي أن نهاية الفئة السابقة هي بداية الفئة التالية.','لا نطرح 1 من الحد الأعلى، لأن الفئات هنا متصلة.'];
     if(k==='classBounds') return ['الفئة الفعلية المتصلة تبدأ من حد فعلي أدنى وتنتهي عند حد فعلي أعلى.','الحد الأعلى للفئة يساوي الحد الأدنى مضافًا إليه سعة الفئة.','مركز الفئة هو منتصف الحدين الفعليين، ولا يعتمد على التكرار.'];
     if(k==='relPctCum') return ['التكرار النسبي يوضح نصيب الفئة من مجموع التكرارات.','التكرار المئوي هو تحويل التكرار النسبي إلى نسبة من 100.','التكرار المتجمع الصاعد يجمع التكرارات من أول فئة حتى الفئة المطلوبة.'];
-    if(k==='hist') return ['المدرج التكراري يستخدم الفئات الفعلية المتصلة، وتكون الأعمدة فيه متلاصقة.','ارتفاع العمود يمثل تكرار الفئة.','عند البحث عن أكبر تكرار ننظر إلى أعلى عمود فقط، ويجب أن تكون الإجابة فئة واحدة دون تعادل.'];
-    if(k==='poly') return ['المضلع التكراري يعتمد على مراكز الفئات وليس على الحدود مباشرة.','نحسب مركز كل فئة، ثم نمثل كل فئة بنقطة مكونة من مركز الفئة وتكرارها.','بعد ذلك نصل النقاط بخطوط مستقيمة.'];
-    if(k==='ogive'||k==='cum') return ['المتجمع الصاعد يعتمد على الحدود العليا الفعلية والتكرارات المتجمعة الصاعدة.','لا نستخدم مراكز الفئات في المتجمع الصاعد.','كل نقطة تعني عدد القيم التي لا تتجاوز الحد الأعلى الفعلي لتلك الفئة.'];
-    if(k==='cumPct') return ['نحسب أولًا التكرار المتجمع الصاعد حتى الفئة المطلوبة.','بعد ذلك نقسم الناتج على مجموع التكرارات للحصول على التكرار النسبي المتجمع.','وعند ضربه في 100 نحصل على التكرار المئوي المتجمع.'];
-    if(k==='mostClass'||k==='most') return ['الفئة الأعلى تكرارًا هي الفئة التي تمتلك أكبر قيمة في عمود التكرار.','لا نستخدم التكرار النسبي أو المتجمع عند المقارنة هنا.','تم توليد التكرارات بحيث يكون هناك جواب واحد فقط دون تعادل.'];
-    if(k==='mid') return ['مركز الفئة هو القيمة الواقعة في منتصف الفئة.','نحسبه من خلال جمع الحد الأدنى الفعلي والحد الأعلى الفعلي ثم القسمة على 2.','لا نستخدم التكرار في حساب مركز الفئة.'];
-    if(k==='pie') return ['زاوية القطاع الدائري تمثل نصيب الفئة من الدائرة كاملة.','الدائرة الكاملة تساوي 360 درجة، لذلك نضرب النسبة في 360.'];
-    if(k==='stem') return ['في الساق والأوراق تمثل الساق العشرات غالبًا، وتمثل الورقة الآحاد.','عدد القيم يساوي عدد الأوراق.','عند طلب الساق الأكثر أو الأقل تكرارًا لا يوجد تعادل بين عدد الأوراق.'];
-    if(k==='datatype') return ['إذا كانت القيم أسماء أو فئات وليست قياسات رقمية فهي بيانات نوعية.','إذا كان بين الفئات ترتيب واضح مثل A ثم B ثم C فهي نوعية ترتيبية.','المدرج التكراري لا يناسب الفئات النوعية؛ لأنه يستخدم فئات عددية متصلة.'];
-    if(k==='pct') return ['نأخذ تكرار الفئة المطلوبة، ثم نقسمه على مجموع التكرارات، وبعد ذلك نحول الناتج إلى تكرار مئوي.','الفرق المهم أن التكرار النسبي لا يكتب معه رمز النسبة، أما التكرار المئوي فيضرب في 100.'];
+    if(k==='pct') return ['نأخذ تكرار الفئة المطلوبة، ثم نقسمه على مجموع التكرارات للحصول على التكرار النسبي، ثم نضرب في 100 للحصول على التكرار المئوي.'];
     if(k==='rel') return ['التكرار النسبي يوضح نصيب الفئة من مجموع التكرارات.','نقسم تكرار الفئة على مجموع التكرارات ولا نضرب في 100.'];
-    return ['اقرأ المطلوب أولًا، ثم حدد هل المطلوب تكرار، تكرار نسبي، تكرار مئوي، مركز فئة، أو تكرار متجمع.','بعد تحديد المطلوب اختر القاعدة المناسبة ثم عوض القيم خطوة خطوة.'];
+    if(k==='cum'||k==='cumRel'||k==='cumPct') return ['نحسب أولًا التكرار المتجمع الصاعد حتى الفئة المطلوبة.','بعد ذلك نقسم الناتج على مجموع التكرارات إذا كان المطلوب تكرارًا نسبيًا متجمعًا، ونضرب في 100 إذا كان المطلوب تكرارًا مئويًا متجمعًا.'];
+    if(k==='readFreq') return ['نحدد الفئة المطلوبة، ثم نقرأ تكرارها مباشرة من الجدول أو من ارتفاع العمود في المدرج.'];
+    if(k==='hist') return ['المدرج التكراري يستخدم الفئات الفعلية المتصلة، وتكون الأعمدة فيه متلاصقة.','ارتفاع العمود يمثل تكرار الفئة.'];
+    if(k==='poly') return ['المضلع التكراري يعتمد على مراكز الفئات وليس على الحدود مباشرة.','كل فئة تمثل بنقطة مكونة من مركز الفئة وتكرارها.'];
+    if(k==='ogive') return ['المتجمع الصاعد يعتمد على الحدود العليا الفعلية والتكرارات المتجمعة الصاعدة.','كل نقطة تعني عدد القيم التي لا تتجاوز الحد الأعلى الفعلي لتلك الفئة.'];
+    if(k==='mostClass') return ['الفئة الأعلى تكرارًا هي الفئة التي تمتلك أكبر قيمة في عمود التكرار.','نقارن قيم التكرارات مباشرة ثم نحدد الفئة المطلوبة.'];
+    if(k==='mid') return ['مركز الفئة هو القيمة الواقعة في منتصف الفئة.','نحسبه من خلال جمع الحد الأدنى الفعلي والحد الأعلى الفعلي ثم القسمة على 2.'];
+    if(k==='pie') return ['زاوية القطاع الدائري تمثل نصيب الفئة من الدائرة كاملة.','الدائرة الكاملة تساوي 360 درجة، لذلك نضرب النسبة في 360.'];
+    if(k==='stem') return ['في الساق والأوراق تمثل الساق العشرات غالبًا، وتمثل الورقة الآحاد.','عدد القيم يساوي عدد الأوراق.','عند طلب الساق الأكثر أو الأقل تكرارًا نقارن عدد الأوراق في كل ساق.'];
+    if(k==='datatype') return ['إذا كانت القيم أسماء أو فئات وليست قياسات رقمية فهي بيانات نوعية.','إذا كان بين الفئات ترتيب واضح مثل A ثم B ثم C فهي نوعية ترتيبية.'];
+    return ['اقرأ المطلوب أولًا، ثم حدد نوع العملية المطلوبة قبل اختيار القانون.'];
   }
+
+
   function ruleLines(p){
+    var direct=A(p&&p.b&&p.b.formula).map(cleanStudentLine).filter(Boolean);
+    if(direct.length) return direct;
     var k=keyOf(p);
-    if(k==='classBuild') return [String.raw`\\(R=x_{max}-x_{min}\\).`,String.raw`\\(k=\\lfloor1.443\\ln(n)\\rfloor\\).`,String.raw`\\(C=\\left\\lceil\\dfrac{R+1}{k}\\right\\rceil\\).`,String.raw`\\(b_i=b_{i-1}+C\\).`,String.raw`\\(R\\) هو المدى، و \\(k\\) عدد الفئات، و \\(C\\) سعة الفئة، و \\(n\\) عدد القيم.`];
-    if(k==='classBounds') return [String.raw`\\(b_i=b_{i-1}+C\\).`,String.raw`\\(x_i=\\dfrac{b_{i-1}+b_i}{2}\\).`,String.raw`\\(b_{i-1}\\) هو الحد الفعلي الأدنى، و \\(b_i\\) هو الحد الفعلي الأعلى، و \\(C\\) سعة الفئة، و \\(x_i\\) مركز الفئة.`];
-    if(k==='relPctCum') return [String.raw`\\(\\phi_i=\\dfrac{f_i}{n}\\).`,String.raw`التكرار المئوي \\(=\\phi_i\\times100\\%\\).`,String.raw`\\(F_i=f_1+f_2+\\cdots+f_i\\).`,String.raw`\\(f_i\\) تكرار الفئة، و \\(n\\) مجموع التكرارات، و \\(F_i\\) التكرار المتجمع الصاعد.`];
-    if(k==='hist') return [String.raw`المدرج التكراري = فئات فعلية متصلة + أعمدة متلاصقة.`,String.raw`ارتفاع العمود = \\(f_i\\).`,String.raw`\\(f_i\\) هو تكرار الفئة رقم \\(i\\).`];
-    if(k==='poly') return [String.raw`\\(x_i=\\dfrac{b_{i-1}+b_i}{2}\\).`,String.raw`نقطة المضلع التكراري هي \\((x_i,f_i)\\).`,String.raw`\\(x_i\\) مركز الفئة، و \\(f_i\\) تكرار الفئة.`];
-    if(k==='ogive'||k==='cum') return [String.raw`\\(F_i=f_1+f_2+\\cdots+f_i\\).`,String.raw`نقطة المتجمع الصاعد هي \\((b_i,F_i)\\).`,String.raw`\\(b_i\\) الحد الفعلي الأعلى للفئة، و \\(F_i\\) التكرار المتجمع الصاعد.`];
-    if(k==='cumPct') return [String.raw`\\(F_i=f_1+f_2+\\cdots+f_i\\).`,String.raw`التكرار النسبي المتجمع \\(=\\dfrac{F_i}{n}\\).`,String.raw`التكرار المئوي المتجمع \\(=\\dfrac{F_i}{n}\\times100\\%\\).`];
-    if(k==='mostClass'||k==='most') return [String.raw`الفئة الأعلى تكرارًا هي الفئة التي تمتلك أكبر \\(f_i\\).`,String.raw`الفئة الأقل تكرارًا هي الفئة التي تمتلك أصغر \\(f_i\\).`,String.raw`لا يوجد تعادل في \\(f_i\\) عند هذا النوع من الأسئلة.`];
-    if(k==='mid') return [String.raw`\\(x_i=\\dfrac{b_{i-1}+b_i}{2}\\).`,String.raw`\\(x_i\\) مركز الفئة، و \\(b_{i-1}\\) الحد الفعلي الأدنى، و \\(b_i\\) الحد الفعلي الأعلى.`];
-    if(k==='pie') return [String.raw`\\(\\theta_i=\\dfrac{f_i}{n}\\times360^\\circ\\).`,String.raw`\\(\\theta_i\\) زاوية القطاع، و \\(f_i\\) تكرار الفئة، و \\(n\\) مجموع التكرارات.`];
-    if(k==='stem') return [String.raw`القيمة = \\(10\\times الساق + الورقة\\).`,String.raw`عدد القيم = عدد الأوراق.`,String.raw`الساق الأكثر تكرارًا هي الساق ذات أكبر عدد من الأوراق دون تعادل.`];
+    if(k==='graphChoice') return ['المدرج التكراري: فئات فعلية متصلة + أعمدة متلاصقة.', String.raw`المضلع التكراري: \((x_i,f_i)\).`, String.raw`المتجمع الصاعد: \((b_i,F_i)\).`, 'الأعمدة: بيانات نوعية أو فئات غير مستمرة.'];
+    if(k==='classBuild') return [String.raw`\(R=x_{max}-x_{min}\).`,String.raw`\(k=\lfloor1.443\ln(n)\rfloor\).`,String.raw`\(C=\left\lceil\dfrac{R+1}{k}\right\rceil\).`,String.raw`\(b_i=b_{i-1}+C\).`,String.raw`\(R\) هو المدى، و \(k\) عدد الفئات، و \(C\) سعة الفئة، و \(n\) عدد القيم.`];
+    if(k==='classBounds') return [String.raw`\(b_i=b_{i-1}+C\).`,String.raw`\(x_i=\dfrac{b_{i-1}+b_i}{2}\).`,String.raw`\(b_{i-1}\) هو الحد الفعلي الأدنى، و \(b_i\) هو الحد الفعلي الأعلى، و \(C\) سعة الفئة، و \(x_i\) مركز الفئة.`];
+    if(k==='relPctCum') return [String.raw`\(\phi_i=\dfrac{f_i}{n}\).`,String.raw`التكرار المئوي \(=\phi_i\times100\%\).`,String.raw`\(F_i=f_1+f_2+\cdots+f_i\).`,String.raw`\(f_i\) تكرار الفئة، و \(n\) مجموع التكرارات، و \(F_i\) التكرار المتجمع الصاعد.`];
+    if(k==='pct') return [String.raw`\(\phi_i=\dfrac{f_i}{n}\).`,String.raw`التكرار المئوي \(=\phi_i\times100\%\).`,String.raw`\(f_i\) تكرار الفئة، و \(n\) مجموع التكرارات.`];
+    if(k==='rel') return [String.raw`\(\phi_i=\dfrac{f_i}{n}\).`,String.raw`\(\phi_i\) التكرار النسبي، و \(f_i\) تكرار الفئة، و \(n\) مجموع التكرارات.`];
+    if(k==='cum') return [String.raw`\(F_i=f_1+f_2+\cdots+f_i\).`,String.raw`\(F_i\) هو التكرار المتجمع الصاعد حتى الفئة المطلوبة.`];
+    if(k==='cumRel') return [String.raw`التكرار النسبي المتجمع \(=\dfrac{F_i}{n}\).`,String.raw`\(F_i\) التكرار المتجمع الصاعد، و \(n\) مجموع التكرارات.`];
+    if(k==='cumPct') return [String.raw`التكرار المئوي المتجمع \(=\dfrac{F_i}{n}\times100\%\).`,String.raw`\(F_i\) التكرار المتجمع الصاعد، و \(n\) مجموع التكرارات.`];
+    if(k==='readFreq') return [String.raw`\(f_i\) هو تكرار الفئة المطلوبة.`];
+    if(k==='hist') return [String.raw`المدرج التكراري = فئات فعلية متصلة + أعمدة متلاصقة.`,String.raw`ارتفاع العمود = \(f_i\).`];
+    if(k==='poly') return [String.raw`\(x_i=\dfrac{b_{i-1}+b_i}{2}\).`,String.raw`نقطة المضلع التكراري هي \((x_i,f_i)\).`];
+    if(k==='ogive') return [String.raw`\(F_i=f_1+f_2+\cdots+f_i\).`,String.raw`نقطة المتجمع الصاعد هي \((b_i,F_i)\).`];
+    if(k==='mostClass') return [String.raw`الفئة الأعلى تكرارًا هي الفئة التي تمتلك أكبر \(f_i\).`,String.raw`نحدد المطلوب من خلال مقارنة قيم \(f_i\) مباشرة.`];
+    if(k==='mid') return [String.raw`\(x_i=\dfrac{b_{i-1}+b_i}{2}\).`,String.raw`\(x_i\) مركز الفئة، و \(b_{i-1}\) الحد الفعلي الأدنى، و \(b_i\) الحد الفعلي الأعلى.`];
+    if(k==='pie') return [String.raw`\(\theta_i=\dfrac{f_i}{n}\times360^\circ\).`,String.raw`\(\theta_i\) زاوية القطاع، و \(f_i\) تكرار الفئة، و \(n\) مجموع التكرارات.`];
+    if(k==='stem') return [String.raw`القيمة = \(10\times الساق + الورقة\).`,String.raw`عدد القيم = عدد الأوراق.`,String.raw`الساق الأكثر تكرارًا هي الساق ذات أكبر عدد من الأوراق.`];
     if(k==='datatype') return ['البيانات النوعية: قيمها أسماء أو فئات.','البيانات النوعية الترتيبية: فئات لها ترتيب واضح.','المدرج التكراري يستخدم بيانات كمية مجمعة في فئات عددية متصلة.'];
-    if(k==='pct') return [String.raw`\\(\\phi_i=\\dfrac{f_i}{n}\\).`,String.raw`التكرار المئوي \\(=\\phi_i\\times100\\%\\).`,String.raw`\\(f_i\\) تكرار الفئة، و \\(n\\) مجموع التكرارات.`];
-    if(k==='rel') return [String.raw`\\(\\phi_i=\\dfrac{f_i}{n}\\).`,String.raw`\\(\\phi_i\\) التكرار النسبي، و \\(f_i\\) تكرار الفئة، و \\(n\\) مجموع التكرارات.`];
-    return ['حدد المطلوب أولًا، ثم اختر القانون المناسب من رموز الكتاب، وبعدها عوض القيم خطوة خطوة.'];
+    return ['حدد المطلوب أولًا، ثم اختر القانون المناسب من رموز الكتاب.'];
   }
+
+
   function exampleLines(p){
     var k=keyOf(p);
-    if(k==='classBuild') return [String.raw`مثال مشابه: إذا كان \\(x_{min}=12\\)، و \\(x_{max}=67\\)، و \\(n=36\\).`,String.raw`\\(R=67-12=55\\).`,String.raw`\\(k=\\lfloor1.443\\ln(36)\\rfloor=5\\).`,String.raw`\\(C=\\left\\lceil\\dfrac{55+1}{5}\\right\\rceil=12\\).`];
-    if(k==='classBounds') return [String.raw`مثال مشابه: إذا كان \\(b_{i-1}=20\\) و \\(C=5\\).`,String.raw`\\(b_i=20+5=25\\).`,String.raw`الفئة الأولى \\(20-25\\)، والفئة التالية تبدأ من \\(25\\).`,String.raw`إذا كانت الفئة \\(25-30\\)، فإن \\(x_i=\\dfrac{25+30}{2}=27.5\\).`];
-    if(k==='relPctCum') return [String.raw`مثال مشابه: الفئات \\(10-20,20-30,30-40,40-50\\) وتكراراتها \\(5,7,8,10\\).`,String.raw`للفئة \\(30-40\\): \\(\\phi_i=\\dfrac{8}{30}=0.267\\).`,String.raw`التكرار المئوي \\(=26.7\\%\\).`,String.raw`\\(F_i=5+7+8=20\\).`];
-    if(k==='hist') return [String.raw`مثال مشابه: الفئات \\(10-20,20-30,30-40\\) وتكراراتها \\(5,14,8\\).`,String.raw`أعلى عمود هو للفئة \\(20-30\\)، لأن \\(f_i=14\\).`];
-    if(k==='poly') return [String.raw`مثال مشابه: الفئة \\(20-30\\) وتكرارها \\(f_i=9\\).`,String.raw`\\(x_i=\\dfrac{20+30}{2}=25\\).`,String.raw`نقطة المضلع التكراري هي \\((25,9)\\).`];
-    if(k==='ogive'||k==='cum') return [String.raw`مثال مشابه: التكرارات \\(4,6,5\\).`,String.raw`التكرارات المتجمعة الصاعدة هي \\(4,10,15\\).`,String.raw`إذا كانت الحدود العليا \\(20,30,40\\)، فإن النقاط هي \\((20,4),(30,10),(40,15)\\).`];
-    if(k==='cumPct') return [String.raw`مثال مشابه: إذا كان \\(F_i=18\\) و \\(n=40\\).`,String.raw`التكرار النسبي المتجمع \\(=\\dfrac{18}{40}=0.450\\).`,String.raw`التكرار المئوي المتجمع \\(=45\\%\\).`];
-    if(k==='mostClass'||k==='most') return [String.raw`مثال مشابه: \\(f_1=6, f_2=11, f_3=7\\).`,String.raw`أكبر تكرار هو \\(f_2=11\\).`,String.raw`إذن الفئة الثانية هي الفئة الأعلى تكرارًا.`];
-    if(k==='mid') return [String.raw`مثال مشابه: الفئة الفعلية \\(30-40\\).`,String.raw`\\(x_i=\\dfrac{30+40}{2}=35\\).`,String.raw`إذن مركز الفئة هو \\(35\\).`];
-    if(k==='pie') return [String.raw`مثال مشابه: إذا كان \\(f_i=4\\) و \\(n=36\\).`,String.raw`\\(\\theta_i=\\dfrac{4}{36}\\times360^\\circ=40^\\circ\\).`];
-    if(k==='stem') return [String.raw`مثال مشابه: \\(2|1,3,7\\) تعني القيم \\(21,23,27\\).`,'عدد القيم يساوي عدد الأوراق، والساق الأكثر تكرارًا هي التي تحتوي أكبر عدد من الأوراق دون تعادل.'];
+    if(k==='graphChoice') return ['مثال مشابه: إذا كان الهدف مقارنة تكرارات فئات عددية متصلة مثل 10–20 و20–30، فالرسم المناسب هو المدرج التكراري.', String.raw`إذا كان الهدف استخدام مراكز الفئات، فالرسم المناسب هو المضلع التكراري \((x_i,f_i)\).`, String.raw`إذا كان الهدف معرفة عدد القيم حتى حد أعلى، فالرسم المناسب هو المتجمع الصاعد \((b_i,F_i)\).`];
+    if(k==='classBuild') return [String.raw`مثال مشابه: إذا كان \(x_{min}=12\)، و \(x_{max}=67\)، و \(n=36\).`,String.raw`\(R=67-12=55\).`,String.raw`\(k=\lfloor1.443\ln(36)\rfloor=5\).`,String.raw`\(C=\left\lceil\dfrac{55+1}{5}\right\rceil=12\).`];
+    if(k==='classBounds') return [String.raw`مثال مشابه: إذا كان \(b_{i-1}=20\) و \(C=5\).`,String.raw`\(b_i=20+5=25\).`,String.raw`الفئة الأولى \(20-25\)، والفئة التالية تبدأ من \(25\).`,String.raw`إذا كانت الفئة \(25-30\)، فإن \(x_i=\dfrac{25+30}{2}=27.5\).`];
+    if(k==='relPctCum') return [String.raw`مثال مشابه: الفئات \(10-20,20-30,30-40,40-50\) وتكراراتها \(5,7,8,10\).`,String.raw`للفئة \(30-40\): \(\phi_i=\dfrac{8}{30}=0.267\).`,String.raw`التكرار المئوي \(=26.7\%\).`,String.raw`\(F_i=5+7+8=20\).`];
+    if(k==='pct') return [String.raw`مثال مشابه: إذا كان \(f_i=6\) و \(n=30\).`,String.raw`\(\phi_i=\dfrac{6}{30}=0.200\).`,String.raw`التكرار المئوي \(=0.200\times100\%=20\%\).`];
+    if(k==='rel') return [String.raw`مثال مشابه: إذا كان \(f_i=8\) و \(n=40\).`,String.raw`\(\phi_i=\dfrac{8}{40}=0.200\).`];
+    if(k==='cum') return [String.raw`مثال مشابه: التكرارات \(4,6,5\).`,String.raw`التكرار المتجمع الصاعد حتى الفئة الثالثة هو \(F_i=4+6+5=15\).`];
+    if(k==='cumRel') return [String.raw`مثال مشابه: إذا كان \(F_i=18\) و \(n=40\).`,String.raw`التكرار النسبي المتجمع \(=\dfrac{18}{40}=0.450\).`];
+    if(k==='cumPct') return [String.raw`مثال مشابه: إذا كان \(F_i=18\) و \(n=40\).`,String.raw`التكرار المئوي المتجمع \(=\dfrac{18}{40}\times100\%=45\%\).`];
+    if(k==='readFreq') return [String.raw`مثال مشابه: إذا كان ارتفاع عمود الفئة \(20-30\) يساوي \(8\)، فإن تكرار الفئة هو \(f_i=8\).`];
+    if(k==='hist') return [String.raw`مثال مشابه: الفئات \(10-20,20-30,30-40\) وتكراراتها \(5,14,8\).`,String.raw`أعلى عمود هو للفئة \(20-30\)، لأن \(f_i=14\).`];
+    if(k==='poly') return [String.raw`مثال مشابه: الفئة \(20-30\) وتكرارها \(f_i=9\).`,String.raw`\(x_i=\dfrac{20+30}{2}=25\).`,String.raw`نقطة المضلع التكراري هي \((25,9)\).`];
+    if(k==='ogive') return [String.raw`مثال مشابه: التكرارات \(4,6,5\).`,String.raw`التكرارات المتجمعة الصاعدة هي \(4,10,15\).`,String.raw`إذا كانت الحدود العليا \(20,30,40\)، فإن النقاط هي \((20,4),(30,10),(40,15)\).`];
+    if(k==='mostClass') return [String.raw`مثال مشابه: \(f_1=6, f_2=11, f_3=7\).`,String.raw`أكبر تكرار هو \(f_2=11\).`,String.raw`إذن الفئة الثانية هي الفئة الأعلى تكرارًا.`];
+    if(k==='mid') return [String.raw`مثال مشابه: الفئة الفعلية \(30-40\).`,String.raw`\(x_i=\dfrac{30+40}{2}=35\).`,String.raw`إذن مركز الفئة هو \(35\).`];
+    if(k==='pie') return [String.raw`مثال مشابه: إذا كان \(f_i=4\) و \(n=36\).`,String.raw`\(\theta_i=\dfrac{4}{36}\times360^\circ=40^\circ\).`];
+    if(k==='stem') return [String.raw`مثال مشابه: \(2|1,3,7\) تعني القيم \(21,23,27\).`,'عدد القيم يساوي عدد الأوراق، والساق الأكثر تكرارًا هي التي تحتوي أكبر عدد من الأوراق.'];
     if(k==='datatype') return ['مثال مشابه: تقديرات الطلاب A و B و C هي فئات وليست قياسات رقمية.','بما أنها مرتبة من الأعلى إلى الأدنى فهي بيانات نوعية ترتيبية.','التمثيل الأنسب لها هو الرسم بالأعمدة، وليس المدرج التكراري.'];
-    if(k==='pct') return [String.raw`مثال مشابه: إذا كان \\(f_i=6\\) و \\(n=30\\).`,String.raw`\\(\\phi_i=\\dfrac{6}{30}=0.200\\).`,String.raw`التكرار المئوي \\(=0.200\\times100\\%=20\\%\\).`];
-    if(k==='rel') return [String.raw`مثال مشابه: إذا كان \\(f_i=8\\) و \\(n=40\\).`,String.raw`\\(\\phi_i=\\dfrac{8}{40}=0.200\\).`];
-    return ['مثال مشابه: نحدد المعطيات، ثم نختار القانون المناسب، ثم نعوض القيم خطوة خطوة حتى نصل إلى إجابة واحدة مكتملة.'];
+    if(k==='bar') return ['مثال مشابه: إذا كانت البيانات أسماء أقسام أو تقديرات، فنستخدم الأعمدة المنفصلة للمقارنة بينها.'];
+    return ['مثال مشابه: نحدد المطلوب، ثم نختار القانون المناسب، ثم نعوض القيم خطوة خطوة حتى نصل إلى إجابة مكتملة.'];
   }
+
   function answerLines(p){
     var out=[];
     try{ A(p.b&&p.b.parts).forEach(function(part){var v=p.b.answers&&p.b.answers[part.key]; if(v!==undefined&&v!==null&&String(v)!=='') out.push((part.label||part.key)+' = '+(Array.isArray(v)?v.join(' أو '):v));});
