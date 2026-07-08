@@ -1,0 +1,24 @@
+{
+  "version": "2.0.0",
+  "model": "bayesian_knowledge_tracing",
+  "chapter": "2",
+  "prior_mastery": 0.35,
+  "learn_rate": 0.12,
+  "guess": 0.2,
+  "slip": 0.1,
+  "skills": [
+    "raw_data_frequency_table",
+    "relative_frequency",
+    "percentage_frequency",
+    "cumulative_frequency",
+    "stem_and_leaf",
+    "pie_chart_angle",
+    "class_number",
+    "class_width",
+    "actual_boundaries",
+    "class_midpoint",
+    "histogram",
+    "frequency_polygon",
+    "ogive"
+  ]
+}

@@ -1,0 +1,3 @@
+/* Local font stack only: no external font links and no remote downloads. */
+:root{--font:"Tahoma","Arial","Segoe UI",system-ui,sans-serif;}
+body,input,button,textarea,select{font-family:var(--font)!important;}
